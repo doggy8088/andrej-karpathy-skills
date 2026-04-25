@@ -141,7 +141,7 @@ copilot plugin marketplace add doggy8088/andrej-karpathy-skills
 然後安裝外掛：
 
 ```bash
-copilot plugin install karpathy-skills@andrej-karpathy-skills
+copilot plugin install andrej-karpathy-skills@karpathy-skills
 ```
 
 這會將指南安裝成 GitHub Copilot CLI 外掛，讓它可以在你的 Copilot CLI 工作流程中使用。
