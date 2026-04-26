@@ -1,171 +1,215 @@
-# Karpathy-Inspired Claude Code Guidelines
+# 受 Karpathy 啟發的 GitHub Copilot CLI 指南
 
-> Check out my new project [Multica](https://github.com/multica-ai/multica) — an open-source platform for running and managing coding agents with reusable skills.
->
-> Follow me on X: [https://x.com/jiayuan_jy](https://x.com/jiayuan_jy)
+> 在 X 上追蹤我：[https://x.com/Will_Huang](https://x.com/Will_Huang)
 
-A single `CLAUDE.md` file to improve Claude Code behavior, derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls.
+這是一份單一的 `AGENTS.md` 文件，用來改善 GitHub Copilot CLI 的行為，內容源自 [Andrej Karpathy 的觀察](https://x.com/karpathy/status/2015883857489522876)，整理了 LLM 在程式開發中常見的陷阱。
 
-English | [简体中文](./README.zh.md)
+[English](./README.md) | 正體中文
 
-## The Problems
+## 問題所在
 
-From Andrej's post:
+來自 Andrej 的推文：
 
-> "The models make wrong assumptions on your behalf and just run along with them without checking. They don't manage their confusion, don't seek clarifications, don't surface inconsistencies, don't present tradeoffs, don't push back when they should."
+> 「模型會替你做出錯誤假設，然後毫不猶豫地執行。它們不會管理自身的不確定，不會尋求釐清，不會呈現矛盾，不會展示取捨，在應該提出異議時也不會反駁。」
 
-> "They really like to overcomplicate code and APIs, bloat abstractions, don't clean up dead code... implement a bloated construction over 1000 lines when 100 would do."
+> 「它們真的很喜歡把程式碼和 API 弄得很複雜，堆疊抽象概念，也不清理未使用程式碼……明明 100 行就能完成的事情，偏偏要做成 1000 行的臃腫架構。」
 
-> "They still sometimes change/remove comments and code they don't sufficiently understand as side effects, even if orthogonal to the task."
+> 「它們有時仍然會改動或刪除自己理解不足的程式碼和註解，即使那些內容與任務本身無關。」
 
-## The Solution
+## 解決方案
 
-Four principles in one file that directly address these issues:
+四個原則，集中在一個文件中，直接對應並解決這些問題：
 
-| Principle | Addresses |
+| 原則 | 解決什麼問題 |
 |-----------|-----------|
-| **Think Before Coding** | Wrong assumptions, hidden confusion, missing tradeoffs |
-| **Simplicity First** | Overcomplication, bloated abstractions |
-| **Surgical Changes** | Orthogonal edits, touching code you shouldn't |
-| **Goal-Driven Execution** | Leverage through tests-first, verifiable success criteria |
+| 寫程式前先思考 | 錯誤假設、隱藏不確定、缺少取捨分析 |
+| 簡潔優先 | 過度複雜、臃腫抽象 |
+| 精準修改 | 無關編輯、碰到不該碰的程式碼 |
+| 目標驅動執行 | 測試優先、可驗證的成功標準 |
 
-## The Four Principles in Detail
+## 四個原則詳解
 
-### 1. Think Before Coding
+### 1. 寫程式前先思考
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+不要假設。不要隱藏不確定。呈現取捨。
 
-LLMs often pick an interpretation silently and run with it. This principle forces explicit reasoning:
+LLM 經常會默默選擇一種解讀，然後直接執行。這個原則會強制它把推理說清楚：
 
-- **State assumptions explicitly** — If uncertain, ask rather than guess
-- **Present multiple interpretations** — Don't pick silently when ambiguity exists
-- **Push back when warranted** — If a simpler approach exists, say so
-- **Stop when confused** — Name what's unclear and ask for clarification
+- 明確說明假設 — 如果不確定，就詢問，而不是猜測
+- 呈現多種解讀 — 當存在歧義時，不要默默替使用者做選擇
+- 適時提出異議 — 如果有更簡單的方法，就說出來
+- 不確定時停下來 — 指出不清楚的地方，並要求釐清
 
-### 2. Simplicity First
+### 2. 簡潔優先
 
-**Minimum code that solves the problem. Nothing speculative.**
+用最少的程式碼解決問題。不要過度推測需求。
 
-Combat the tendency toward overengineering:
+這個原則用來對抗過度工程的傾向：
 
-- No features beyond what was asked
-- No abstractions for single-use code
-- No "flexibility" or "configurability" that wasn't requested
-- No error handling for impossible scenarios
-- If 200 lines could be 50, rewrite it
+- 不要加入需求之外的功能
+- 不要為一次性程式碼建立抽象
+- 不要加入未被要求的「彈性」或「可設定性」
+- 不要為不太可能發生的情境加入錯誤處理
+- 如果 200 行程式碼可以寫成 50 行，就重寫它
 
-**The test:** Would a senior engineer say this is overcomplicated? If yes, simplify.
+檢驗標準：資深工程師會不會覺得這太複雜？如果會，就簡化。
 
-### 3. Surgical Changes
+### 3. 精準修改
 
-**Touch only what you must. Clean up only your own mess.**
+只碰必須碰的地方。只清理自己造成的混亂。
 
-When editing existing code:
+編輯既有程式碼時：
 
-- Don't "improve" adjacent code, comments, or formatting
-- Don't refactor things that aren't broken
-- Match existing style, even if you'd do it differently
-- If you notice unrelated dead code, mention it — don't delete it
+- 不要「改善」旁邊的程式碼、註解或格式
+- 不要重構沒有壞掉的東西
+- 配合既有風格，即使你更偏好另一種寫法
+- 如果注意到無關的未使用程式碼，可以提一下，但不要直接刪掉
 
-When your changes create orphans:
+當你的改動造成孤兒程式碼時：
 
-- Remove imports/variables/functions that YOUR changes made unused
-- Don't remove pre-existing dead code unless asked
+- 刪除因你的改動而變得無用的 import、變數、函式
+- 不要刪除原本就存在的未使用程式碼，除非使用者要求
 
-**The test:** Every changed line should trace directly to the user's request.
+檢驗標準：每一行修改都應該能直接追溯到使用者的請求。
 
-### 4. Goal-Driven Execution
+### 4. 目標驅動執行
 
-**Define success criteria. Loop until verified.**
+定義成功標準。反覆驗證，直到達成。
 
-Transform imperative tasks into verifiable goals:
+將指令式任務轉化為可驗證的目標：
 
-| Instead of... | Transform to... |
+| 不要這樣做... | 轉化為... |
 |--------------|-----------------|
-| "Add validation" | "Write tests for invalid inputs, then make them pass" |
-| "Fix the bug" | "Write a test that reproduces it, then make it pass" |
-| "Refactor X" | "Ensure tests pass before and after" |
+| 「加入驗證」 | 「為無效輸入撰寫測試，然後讓測試通過」 |
+| 「修復 bug」 | 「撰寫能重現 bug 的測試，然後讓測試通過」 |
+| 「重構 X」 | 「確保重構前後測試都能通過」 |
 
-For multi-step tasks, state a brief plan:
+對於多步驟任務，說明一個簡短計畫：
 
 ```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
+1. [步驟] → 驗證：[檢查]
+2. [步驟] → 驗證：[檢查]
+3. [步驟] → 驗證：[檢查]
 ```
 
-Strong success criteria let the LLM loop independently. Weak criteria ("make it work") require constant clarification.
+強而有力的成功標準，可以讓 LLM 獨立進行循環式執行。薄弱的標準，例如「讓它可以運作」，則會需要不斷釐清。
 
-## Install
+## 安裝
 
-**Option A: Claude Code Plugin (recommended)**
+選項 A：GitHub Copilot CLI 外掛
 
-From within Claude Code, first add the marketplace:
-```
-/plugin marketplace add forrestchang/andrej-karpathy-skills
-```
+先確認你已經安裝 GitHub Copilot CLI。
 
-Then install the plugin:
-```
-/plugin install andrej-karpathy-skills@karpathy-skills
-```
+macOS 或 Linux 使用 Homebrew：
 
-This installs the guidelines as a Claude Code plugin, making the skill available across all your projects.
-
-**Option B: CLAUDE.md (per-project)**
-
-New project:
 ```bash
-curl -o CLAUDE.md https://raw.githubusercontent.com/forrestchang/andrej-karpathy-skills/main/CLAUDE.md
+brew install copilot-cli
 ```
 
-Existing project (append):
+Windows 使用 WinGet：
+
+```powershell
+winget install GitHub.Copilot
+```
+
+所有平台也可以使用 npm：
+
 ```bash
-echo "" >> CLAUDE.md
-curl https://raw.githubusercontent.com/forrestchang/andrej-karpathy-skills/main/CLAUDE.md >> CLAUDE.md
+npm install -g @github/copilot
 ```
 
-## Using with Cursor
+如果 `~/.npmrc` 設定了 `ignore-scripts=true`，請改用：
 
-This repository includes a committed Cursor project rule ([`.cursor/rules/karpathy-guidelines.mdc`](.cursor/rules/karpathy-guidelines.mdc)) so the same guidelines apply when you open the project in Cursor. See **[CURSOR.md](CURSOR.md)** for setup, using the rule in other projects, and how this relates to Claude Code.
+```bash
+npm_config_ignore_scripts=false npm install -g @github/copilot
+```
 
-## Key Insight
+首次使用時，請登入 Copilot CLI：
 
-From Andrej:
+```bash
+copilot login
+```
 
-> "LLMs are exceptionally good at looping until they meet specific goals... Don't tell it what to do, give it success criteria and watch it go."
+接著加入外掛市集：
 
-The "Goal-Driven Execution" principle captures this: transform imperative instructions into declarative goals with verification loops.
+```bash
+copilot plugin marketplace add doggy8088/andrej-karpathy-skills
+```
 
-## How to Know It's Working
+然後安裝外掛：
 
-These guidelines are working if you see:
+```bash
+copilot plugin install andrej-karpathy-skills@karpathy-skills
+```
 
-- **Fewer unnecessary changes in diffs** — Only requested changes appear
-- **Fewer rewrites due to overcomplication** — Code is simple the first time
-- **Clarifying questions come before implementation** — Not after mistakes
-- **Clean, minimal PRs** — No drive-by refactoring or "improvements"
+這會將指南安裝成 GitHub Copilot CLI 外掛，讓它可以在你的 Copilot CLI 工作流程中使用。
 
-## Customization
+如果你想直接從 GitHub repository 安裝外掛，也可以使用：
 
-These guidelines are designed to be merged with project-specific instructions. Add them to your existing `CLAUDE.md` or create a new one.
+```bash
+copilot plugin install doggy8088/andrej-karpathy-skills
+```
 
-For project-specific rules, add sections like:
+注意：直接從 repository 安裝時，該 repository 必須包含 Copilot CLI 外掛所需的 `plugin.json`，且該檔案需位於 repository 根目錄、`.plugin`、`.github/plugin` 或 `.claude-plugin` 目錄中。
+
+選項 B：AGENTS.md（依專案設定）
+
+新專案：
+
+```bash
+curl -o AGENTS.md https://raw.githubusercontent.com/doggy8088/andrej-karpathy-skills/main/AGENTS.md
+```
+
+既有專案（追加內容）：
+
+```bash
+echo "" >> AGENTS.md
+curl https://raw.githubusercontent.com/doggy8088/andrej-karpathy-skills/main/AGENTS.md >> AGENTS.md
+```
+
+GitHub Copilot CLI 會自動讀取位於 Git root 或目前工作目錄中的 `AGENTS.md`，因此你可以把這份指南放在 repository 根目錄，作為專案層級的 Copilot CLI 指示。
+
+## 在 Cursor 中使用
+
+本倉庫包含一個已提交的 Cursor 專案規則 ([`.cursor/rules/karpathy-guidelines.mdc`](.cursor/rules/karpathy-guidelines.mdc))，因此在 Cursor 中開啟專案時，這些指南同樣會生效。詳細內容請參考 [CURSOR.md](CURSOR.md)，其中包含如何在其他專案中使用該規則，以及它與 GitHub Copilot CLI 的關係。
+
+## 核心洞察
+
+來自 Andrej：
+
+> 「LLM 非常擅長循環執行，直到達成特定目標……不要告訴它該做什麼，給它成功標準，然後看著它完成。」
+
+「目標驅動執行」原則正是捕捉了這一點：將指令式指令，轉化為帶有驗證循環的宣告式目標。
+
+## 如何判斷它正在發揮作用
+
+如果你看到以下情況，代表這些指南正在發揮作用：
+
+- diff 中不必要的改動更少 —— 只有被請求的改動出現
+- 因過度複雜而導致的重寫更少 —— 程式碼第一次就寫得簡潔
+- 釐清問題會在實作之前提出 —— 而不是犯錯之後才問
+- 乾淨、精簡的 PR —— 沒有順手做的重構或「改善」
+
+## 客製化
+
+這些指南的設計目標，是可以與專案特定指令合併使用。你可以將它們加入既有的 `AGENTS.md`，或建立一份新的。
+
+若要加入專案特定規則，可以新增如下章節：
 
 ```markdown
-## Project-Specific Guidelines
+## 專案特定指南
 
-- Use TypeScript strict mode
-- All API endpoints must have tests
-- Follow the existing error handling patterns in `src/utils/errors.ts`
+- 使用 TypeScript 嚴格模式
+- 所有 API 端點都必須有測試
+- 遵循 `src/utils/errors.ts` 中既有的錯誤處理模式
 ```
 
-## Tradeoff Note
+## 取捨說明
 
-These guidelines bias toward **caution over speed**. For trivial tasks (simple typo fixes, obvious one-liners), use judgment — not every change needs the full rigor.
+這些指南偏向謹慎，而不是速度。對於瑣碎任務，例如簡單的錯字修正、顯而易見的一行修改，請自行判斷；並不是每一次改動都需要完整而嚴謹的流程。
 
-The goal is reducing costly mistakes on non-trivial work, not slowing down simple tasks.
+目標是減少非瑣碎工作中代價高昂的錯誤，而不是拖慢簡單任務。
 
-## License
+## 授權
 
 MIT
