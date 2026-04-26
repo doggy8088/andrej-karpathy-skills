@@ -144,14 +144,6 @@ copilot plugin install andrej-karpathy-skills@karpathy-skills
 
 這會將指南安裝成 GitHub Copilot CLI 外掛，讓它可以在你的 Copilot CLI 工作流程中使用。
 
-如果你想直接從 GitHub repository 安裝外掛，也可以使用：
-
-```bash
-copilot plugin install doggy8088/andrej-karpathy-skills
-```
-
-注意：直接從 repository 安裝時，該 repository 必須包含 Copilot CLI 外掛所需的 `plugin.json`，且該檔案需位於 repository 根目錄、`.plugin`、`.github/plugin` 或 `.claude-plugin` 目錄中。
-
 選項 B：AGENTS.md（依專案設定）
 
 新專案：
